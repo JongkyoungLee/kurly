@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.member.MemberMapper">
+	<select id="useridCheck" resultType="Integer">
+		select count(*) from myshop
+		where userid=#{userid}
+	</select>
+	<insert id="memberOk" parameterType="com.example.demo.member.MemberDto">
+		insert into myshop(userid, pwd, email, phone, writeday,name)
+		values(#{userid},#{pwd},#{email},#{phone},now(),#{name})
+	</insert>
+	<select id="cartView" resultType="com.example.demo.dto.ProductDto">
+		select p.pimg, p.title, p.baeday, p.price, p.juk, p.baeprice, c.su, c.id, c.writeday, c.pcode
+		,if(c.writeday=curdate(), 1, 0) as wchk 
+		from product as p inner join cart as c on p.pcode = c.pcode where userid=#{userid} 
+	</select>
+	<delete id="cartDel">
+		delete from cart where id=#{id}
+	</delete>
+	<update id="chgSu">
+		update cart set su=#{num} where id=#{id}
+	</update>
+	<select id="getProduct" resultType="com.example.demo.dto.ProductDto">
+		select p.pcode, p.pimg, p.title, p.baeday, p.price, p.juk, p.baeprice from product as p where pcode=#{pcode}
+	</select>
+	<select id="jjimList" resultType="com.example.demo.dto.ProductDto">
+		select p.baeprice, p.title, p.pimg, (p.price-(p.price * p.halin/100))
+		 as price, j.id, j.pcode from jjim as j inner join product as p 
+		 on j.pcode = p.pcode where userid=#{userid}
+	</select>
+	<delete id="jjimDel">
+		delete from jjim where id=#{id}
+	</delete>
+	<select id="addCart">
+		insert into cart(userid, pcode,su,writeday)
+		values(#{userid},#{pcode},1,now())
+	</select>
+	<select id="getCartSu" resultType="String">
+		select count(*) from cart where userid=#{userid}
+	</select>
+	<select id="isCart" resultType="Boolean">
+		select count(*) from cart where userid=#{userid} and pcode=#{pcode}
+	</select>
+	<update id="upCart">
+		update cart set su = su + 1 where userid=#{userid} and pcode=#{pcode}
+	</update>
+	<select id="buyList" resultType="HashMap">
+		select g.review, g.id, g.state, p.pimg, p.price, p.title,p.pcode, b.juso, b.name
+		from product as p inner join gumae as g on p.pcode = g.pcode
+		inner join baesong as b on g.baeId=b.id where g.userid=#{userid}
+		order by jumuncode desc
+	</select>
+	<update id="chgState">
+		update gumae set state=#{state} where id=#{id}
+	</update>
+	<insert id="reviewOk">
+		insert into review(userid, pcode, star, title, content, writeday, gid)
+		values(#{userid}, #{pcode}, #{star}, #{title}, #{content}, now(), #{gid})
+	</insert>
+	<update id="chgReview">
+		update gumae set review = 1 where id=#{id}
+	</update>
+	<select id="avgStar" resultType="Double">
+		select ifnull(sum(star)/count(*),0) from review
+		where pcode=#{pcode}
+	</select>
+	<update id="chgStar">
+		update product set star=#{avg}
+		where pcode=#{pcode}
+	</update>
+	<update id="upReview">
+		update product set review=review+1
+		where pcode=#{pcode}
+	</update>
+	<delete id="reviewDelete">
+		delete from review where id=#{id}
+	</delete>
+	<update id="chgStar2">
+		update product set star=#{avg}, review=review-1
+		where pcode=#{pcode}
+	</update>
+	<update id="setReview">
+		update gumae set review=0 where id=#{id}
+	</update>
+	<select id="getReview" resultType="com.example.demo.dto.ReviewDto">
+		select * from review where id=#{id}
+	</select>
+	<update id="reviewUpdateOk">
+		update review set star=#{star}, title=#{title}, content=#{content}
+		where id=#{id}
+	</update>
+	
+</mapper>

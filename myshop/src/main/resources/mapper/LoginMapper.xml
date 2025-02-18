@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.login.LoginMapper">
+	<select id="loginOk" resultType="String">
+		select name from myshop
+		where userid=#{userid} and (pwd=#{pwd} or oldPwd=#{pwd})
+	</select>
+	<select id="getUserid" resultType="String">
+		select userid from myshop where name=#{name} and email=#{email}
+	</select>
+	<select id="getUserPwd" resultType="String">
+		select pwd from myshop where name=#{name} and email=#{email} and userid=#{userid}
+	</select>
+	<update id="chgPwd">
+		update myshop set oldPwd=#{oldPwd}, pwd=#{pwd} where userid =#{userid}
+	</update>
+	<insert id="addCart">
+		insert into cart(userid, pcode, su, writeday)
+		values(#{userid}, #{pcode}, #{su}, now())
+	</insert>
+	<select id="cartIs" resultType="Boolean">
+		select count(*) from cart where userid=#{userid} and pcode=#{pcode}
+	</select>
+	<update id="cookieUpdate">
+		update cart set su = su +${su} where userid=#{userid} and pcode=#{pcode}
+	</update>
+	<select id="getGumae" resultType="com.example.demo.dto.GumaeDto">
+		select * from gumae where jumuncode=#{jumuncode}
+	</select>
+	<select id="getBaesong2" resultType="com.example.demo.dto.BaesongDto">
+		select * from baesong where id=#{id}
+	</select>
+</mapper>
